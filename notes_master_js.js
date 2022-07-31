@@ -716,7 +716,7 @@ const modificarObjeto = (key, objeto) => {
 
 const eliminarObjeto = key => {
     const IDBData = getIDBData("readwrite", "Objeto eliminado correctamente");
-    IDBData.delete(key); //Si no existe un objeto con ese key, funcion como un add()
+    IDBData.delete(key); 
 }
 
 //****Analizar proyecto hecho en clase
@@ -725,3 +725,13 @@ const eliminarObjeto = key => {
 "MATCHMEDIA"
 
 //Sirve para trabajar el resposive design pero solo es recomendado para cosas que no se pueden hacer con CSS
+
+//Dato: ctrl + shift + R para cuando los estilos no se guarden (es para que se actualice la pagina sin el cache)
+
+const mq = matchMedia("(max-width: 500px)");
+const caja = document.querySelector(".caja");
+
+mq.addEventListener("change", ()=>{ //El evento change actua cuando cambia de true a false o de false a true
+    if(mq.matches) caja.classListReplace("cajaNormal", "cajaResponsive"); //.matches es una propiedad del objeto matchMedia, que cuando cumple con el mediaquery se pone true, y sino en false
+    else if (caja.className == "cajaResponsive") caja.classList.replace("cajaResponsive", "cajaNormal");
+});
