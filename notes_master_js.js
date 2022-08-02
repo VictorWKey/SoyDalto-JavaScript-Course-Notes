@@ -762,3 +762,18 @@ for(let caja of cajas){
 }
 
 //**Ver proyecto de Instersection observer y lazy load (Servidor local)
+
+
+
+
+"VISIBILITY CHANGE"
+
+addEventListener("visibilitychange", e=>{
+    if(e.target.visibilityState == "visible"){
+        console.log("Has esto");
+    } else if (e.target.visibilityState == "hidden"){
+        console.log("Has esto otro");
+    }
+})
+
+//Se puede utilizar para pausar videos o juegos cuando sales de esa pestaña por ejemplo
