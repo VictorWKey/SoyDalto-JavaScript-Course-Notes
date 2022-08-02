@@ -777,3 +777,22 @@ addEventListener("visibilitychange", e=>{
 })
 
 //Se puede utilizar para pausar videos o juegos cuando sales de esa pestaña por ejemplo
+
+
+
+
+"NOTIFICATION"
+
+if(!(`Notification` in window)){
+    console.log("Las notificaciones no estan disponibles en tu navegador");
+}
+
+//El callback es opcional y lo que hace este metodo es preguntarle al usuario si quiere activar las notificaciones de ese sitio
+
+Notification.requestPermission(()=>{
+    if(Notification.permission == "granted"){
+        console.log("Has algo");
+    }
+})
+
+new Notification("Soy Dalto subio un nuevo video :)"); //De esta manera tiramos una notificacion
