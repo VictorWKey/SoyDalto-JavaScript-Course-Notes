@@ -735,3 +735,30 @@ mq.addEventListener("change", ()=>{ //El evento change actua cuando cambia de tr
     if(mq.matches) caja.classListReplace("cajaNormal", "cajaResponsive"); //.matches es una propiedad del objeto matchMedia, que cuando cumple con el mediaquery se pone true, y sino en false
     else if (caja.className == "cajaResponsive") caja.classList.replace("cajaResponsive", "cajaNormal");
 });
+
+
+
+"INTERSECTION OBSERVER"
+
+const cajas = document.querySelectorAll(".caja");
+
+//entries sera un array en el que se insertara un objeto intersectionObserverEntry por cada elemento que se este observando y este objeto tiene dentro de si, una propiedad: isIntersecting, la cual cambia true cuando se muestra en el viewport y sino cambia false en tiempo real
+
+const callback = (entries)=>{
+    for(let entry of entries){
+        if (entry.isIntersecting) console.log(`Se esta viendo la caja: ${entry.target.textContent}`)
+    }
+};
+
+const options = {
+    rootMargin: "60px"; //Esto hara que el isIntersecting se ponga true 60px antes de que llegue a verlo y si se pone por ejemplo: -60px, lo que hara es que se pondra true 60px despues de verlo
+    treshold: [0.8]; //Esto lo que hara es que el isIntersecting se pondra true cuando el 80% del elemento se vea
+}
+
+const observer = new IntersectionObserver(callback, options);
+
+for(let caja of cajas){
+    observer.observe(caja);
+}
+
+//**Ver proyecto de Instersection observer y lazy load (Servidor local)
