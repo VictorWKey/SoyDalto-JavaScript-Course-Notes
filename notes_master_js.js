@@ -796,3 +796,33 @@ Notification.requestPermission(()=>{
 })
 
 new Notification("Soy Dalto subio un nuevo video :)"); //De esta manera tiramos una notificacion
+
+
+
+
+"WEB WORKER"
+
+//El web worker sirve para ejecutar un proceso al mismo tiempo que se ejecuta un proceso dentro del script original
+
+//CODIGO DEL SCRIPT ORIGINAL:
+
+const worker = new Worker("worker.js"); //Asi se crea un worker y de parametro va el nombre del archivo que sera el worker
+document.querySelector(".button").addEventListener("click", ()=>enviarMensaje());
+//Para escuchar y recibir un mensaje se utiliza el evento message
+worker.addEventListener("message", e=>{ 
+    console.log(e.data); //Asi se obtiene el valor del mensaje que se envio desde el worker al script
+    worker.terminate();  //Con esto el worker termina y ya no sigue utilizando mas
+})
+
+const enviarMensaje = ()=>{
+    worker.postMessage("Que onda bro, todo bien?"); //Para enviar un mensaje se utiliza postMessage() y dentro del parametro va el mensaje
+}
+
+//CODIGO DEL WORKER:
+
+addEventListener("message", (e)=>{
+    console.log(e.data) //Asi se obtiene el valor del mensaje que envio el worker
+    postMessage("Todo bien pa");  //Asi se envia un mensaje del worker al script original
+});
+
+//Los web workers tiene una limitacion en cuanto al tipo de datos que puede tener, por ejemplo no puede tener objetos, por eso es que esto se deben enviar desde el script original al worker en forma de mensaje
