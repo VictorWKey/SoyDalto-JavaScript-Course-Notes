@@ -800,7 +800,7 @@ new Notification("Soy Dalto subio un nuevo video :)"); //De esta manera tiramos 
 
 
 
-"WEB WORKER"
+"DEDICATED WEB WORKER"
 
 //El web worker sirve para ejecutar un proceso al mismo tiempo que se ejecuta un proceso dentro del script original
 
@@ -826,3 +826,11 @@ addEventListener("message", (e)=>{
 });
 
 //Los web workers tiene una limitacion en cuanto al tipo de datos que puede tener, por ejemplo no puede tener objetos, por eso es que esto se deben enviar desde el script original al worker en forma de mensaje
+
+
+
+
+"SAME ORIGIN POLITIC (WEB WORKERS)"
+
+//Para mandar a llamar a un worker, el worker debe tener el mismo protocolo, host y puerto que el que tiene el script original.
+//Si ponemos solo el nombre de el archivo, con eso estamos queriendo decir que lo obtendremos desde el same origin, es decir, del mismo origen
