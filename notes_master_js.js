@@ -887,3 +887,55 @@ const date4 = new Date();
 memoizer(hacerAlgo)(90000);
 console.log(new Date() - date4); //Lo mismo que el anterior
  
+
+
+
+"CACHE"
+
+
+//El request o solicitud es la url o archivo 
+cache.add(request); //Toma una URL, la recupera y agrega el objeto de respuesta resultante a la cache dada. Esto es funcionalmente equivalente a llamar fetch() y luego usar un put() para agregar los resultados a la cache
+cache.addAll(["archivo1", "archivo276"]); //Lo que hace es agregar varias url al cache al mismo tiempo
+cache.match(request, options) //El parametro options es opcional pero tecnicamente lo que hace es: Devuelve un promise que se resuelve con la respuesta asociada con la primera solicitud coincidente en el objeto almacenado
+cache.matchAll() //Devuelve un Promise que se resuelve en una matriz de todas las solicitudes coincidentes en el objeto almacenado
+cache.put(request, response) //Toma tanto una solicitud como su respuesta y la agrega a la cache dada. Para ahorrarnos todo el proceso que se hace con put, simplemente hay que utilizar cache.add(); . El put si suele usarse pero mas que nada con node js
+cache.delete(request, options) //Encuentra la entrada del objeto cuya clave es la solicitud, devolviendo un Promise que resuelve true si el objeto se encuentra y se elimina una entrada coincidente. Si no se encuentra ninguna entrada, la promesa resuelve false
+cache.keys(request, options) //Devuelve un Promise que se resuelve en na matriz de keys de los objetos almacenados
+
+caches.open("archivos-estaticos").then(cache =>{
+    cache.add("index.html");
+})
+
+caches.open("archivos-estaticos2").then(cache =>{
+    cache.addAll(["index.html", "style.css", "script.js"]);
+})
+
+//Recuerda que aunque borremos el codigo que agrega algo al cache, aun asi el cache no se borrara y siempre estara ahi al menos que lo borremos
+
+//Lo siguiente devolvera en consola un "response" (objeto) con varios datos de esa url (archivo). Solo los devolvera si este se encuentra almacenado en cache. Si esa url (archivo) no se encuentra almacenado en cache, nos devolvera undefined
+caches.open("archivos-estaticos").then(cache =>{
+    cache.match("index.html").then(res => console.log(res));
+})
+
+//Lo siguiente devolvera en consola un array con varios "response" (objeto) dentro de si, que contienen los datos de cada uno de ellos. Este metodo sirve para almacenar varias response que tienen de base la misma url (archivo). Solo los devolvera si este se encuentra almacenado en cache. Si esa url (archivo) no se encuentra almacenado en cache, nos devolvera array con nada dentro. 
+caches.open("archivos-estaticos").then(cache =>{
+    cache.matchAll("index.html").then(res => console.log(res));
+})
+
+caches.open("archivos-estaticos-3").then(cache =>{
+    fetch("index.html").then(res=>{
+        cache.put("index.html", res);
+    })
+})
+
+caches.open("archivos-estaticos-4").then(cache =>{
+    cache.delete("index.html").then(res=>console.log(res)) //El .then() no es necesario para eliminar el archivo pero este nos sirve para obtener una respuesta. Devolvera true si el archivo se elimino correctamente, devolvera false si el archivo ya esta eliminado o no esta en el cache
+})
+
+caches.open("archivos-estaticos-5").then(cache =>{
+    cache.addAll(["index.html", "style.css", "script.js"]).then(res => console.log(res));
+    cache.keys().then(res=>{
+        console.log(res);
+    }) //Nos devuelve un array con cada uno de los archivos almacenados en cache. Nos devuelve un array con un objeto Request por cada archivo almacenado en el cache y este contiene toda la data de cada uno de esos archivos
+})
+
