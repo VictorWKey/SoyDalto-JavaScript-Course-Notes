@@ -834,3 +834,56 @@ addEventListener("message", (e)=>{
 
 //Para mandar a llamar a un worker, el worker debe tener el mismo protocolo, host y puerto que el que tiene el script original.
 //Si ponemos solo el nombre de el archivo, con eso estamos queriendo decir que lo obtendremos desde el same origin, es decir, del mismo origen
+
+
+
+
+"MEMOIZATION"
+
+//No es "Memorization", es "Memoization"
+//Wikepia: en Informática, el término memoización (del inglés memoization) es una técnica de optimización que se usa principalmente para acelerar los tiempos de cálculo, almacenando los resultados de la llamada a una subrutina en una memoria intermedia o búfer y devolviendo esos mismos valores cuando se llame de nuevo a la subrutina o función con los mismos parámetros de entrada.
+//Hacer una funcion que memorize algun proceso que ya se realizo antes, hara que tu pagina este mas optimizada porque ya no tendra que volver a repetir el proceso que realizo antes para sacar determinado calculo
+//Memoization:
+
+const hacerAlgo = num => {
+    const a = 20;
+    const b = 12;
+    let c = 0;
+    for(let i = num - 1; i >= 0; i--){
+        for (let j = i - 1; j >= 0; j--){
+            c+= a*b
+        }
+    }
+    return c;
+}
+
+let cache = [];
+
+
+const memoizer = func =>{
+    return e => {
+        if(cache[e] == undefined){
+            cache[e] = func(e);
+        }
+        return cache[e];
+    }
+}
+
+//Nota personal para comprender: No olvides que el parametro "e" primero lo toma la funcion dentro del memorizer y despues ya lo utiliza en la funcion que hara el calculo y hara el calculo con el valor insertado dentro de "e" y lo guardara dentro del cache (Si no entendiste eso, simplemente analizalo logicamente y ya)
+
+const date1 = new Date(); 
+memoizer(hacerAlgo)(90000);
+console.log(new Date() - date1); //Devolvera 4000ms, porque eso es lo que tarda en hacerse el calculo normalmente. Pero este valor se guardara en el cache (porque en el cache, esa posicion es undefined), exactamente en la posicion que se utilizo como parametro de la funcion "hacerAlgo"
+
+const date2 = new Date();
+memoizer(hacerAlgo)(90000); 
+console.log(new Date() - date2); //Devolver 0ms, porque por medio del memoization, ya se encuentra guardado en el cache y por lo tanto no tiene que volver a hacer el calculo y simplemente muestra la posicion del cache donde este ya esta guardado
+
+const date3 = new Date();
+memoizer(hacerAlgo)(90000);
+console.log(new Date() - date3); //Lo mismo que el anterior
+
+const date4 = new Date();
+memoizer(hacerAlgo)(90000);
+console.log(new Date() - date4); //Lo mismo que el anterior
+ 
