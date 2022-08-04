@@ -900,7 +900,10 @@ cache.match(request, options) //El parametro options es opcional pero tecnicamen
 cache.matchAll() //Devuelve un Promise que se resuelve en una matriz de todas las solicitudes coincidentes en el objeto almacenado
 cache.put(request, response) //Toma tanto una solicitud como su respuesta y la agrega a la cache dada. Para ahorrarnos todo el proceso que se hace con put, simplemente hay que utilizar cache.add(); . El put si suele usarse pero mas que nada con node js
 cache.delete(request, options) //Encuentra la entrada del objeto cuya clave es la solicitud, devolviendo un Promise que resuelve true si el objeto se encuentra y se elimina una entrada coincidente. Si no se encuentra ninguna entrada, la promesa resuelve false
-cache.keys(request, options) //Devuelve un Promise que se resuelve en na matriz de keys de los objetos almacenados
+cache.keys(request, options) //Devuelve un Promise que se resuelve en na matriz de keys de los objetos almacenados dentro de ese cache. En cambio: 
+caches.keys().then(res=>console.log(res)); //Devuelve un array, en el que cada posicion tiene el nombre de cada cache creado (abierto/open)
+//No confundas cache con caches
+//cache es el nombre que se le  dio a la respuesta de la promesa (en el .then) y caches es el nombre reservado al cache
 
 caches.open("archivos-estaticos").then(cache =>{
     cache.add("index.html");
@@ -939,3 +942,153 @@ caches.open("archivos-estaticos-5").then(cache =>{
     }) //Nos devuelve un array con cada uno de los archivos almacenados en cache. Nos devuelve un array con un objeto Request por cada archivo almacenado en el cache y este contiene toda la data de cada uno de esos archivos
 })
 
+
+
+
+"SERVICE WORKER"
+
+//Un service worker lo que hace es estar entre el navegaro y el servidor
+//Cuando el navegador le hace una peticion al servidor, el service worker recibe esa informacion, se la da al servidor, el servidor nos da una respuesta, el service worker recibe esa respuesta y por ultimo el service worker le da la respuesta al navegador
+//El service worker corre en el almacenamiento local del usuario. Si nosotros cerramos la pagina, el service worker sigue corriendo, no forma parte del hilo normal de la pagina, corre en el background.
+//this. es lo mismo que poner self. pero cuando trabajamos con service worker, lo ideal es poner self.
+
+//SCRIPT:
+
+if(navigator.serviceWorker){
+    navigator.serviceWorker.register("sw.js"); //Esta es la forma de registrar ("instalar") un service worker
+}
+
+navigator.serviceWorker.ready.then(res=>res.active.postMessage("Hola bro yo soy el mensaje")) //Lo qe hara .ready es es verificar que el service worker ya haya cargado en la pagina, ya que tarda en cargar. Lo que nos devuelve .ready es una promesa y esa promesa tiene como respuesta un objeto serviceWorkerRegistration y dentro de este se encuentra una propiedad llamada "active" (que se refiere al service worker activo), la cual tiene dentro un objeto con la data del service worker instalado, y a partir de este ultimo objeto, ya se puede utilizar .postMessage() (Sin el ready no se puede por que se necesita del objeto "serviceWorker" para acceder a sus metodos, en este caso postMessage())
+
+navigator.serviceWorker.addEventListener("message", e=>{
+    console.log("Mensaje recibido del serviceWorker");
+    console.log(e.data)
+})
+
+//SERVICE WORKER:
+
+//El service worker solo se instala una vez, por lo tanto el console.log de abajo solo se mostrara la primera vez cuando se instale
+self.addEventListener("install", (e)=>{
+    console.log("Instalando service worker");
+});
+
+//Solo se ejecuta una vez despues de instalarse:
+self.addEventListener("activate", ()=>{
+    console.log("El service worker esta activo");
+})
+
+
+
+//El evento fetch lo que hace es verificar que se este enviando una solicitud a este service worker y el service worker intercepta peticiones
+self.addEventListener("fetch", (e)=>{
+    console.log("Service worker interceptado", e); //"e" lo que nos devuelve es un objeto "FetchEvent", el cual tiene una propiedad llamada "request", la cual regresa toda la info del script original, porque de ahi fue donde se hizo la peticion
+})
+
+self.addEventListener("message", (e)=>{
+     console.log("Mensaje recibido del navegador: ");
+    console.log(e.data);
+    e.source.postMessage("Hola bb que tal"); //La manera en que se envia un mensaje del service worker al navigator es muy diferente que lo inverso (OJO)
+}) 
+
+//Observa el proyecto de cacheado offline, osea el que se llama service_worker y esta en el localhost (No funciono y no logro descubrir por que pero igual pronto lo vere en el curso de node js)
+
+
+
+"COOKIES"
+
+//El valor de una cookie debe estar definido de la siguiente manera: "name=value" y el name no debe repetirse, porque sino se sobreescribira la cookie
+
+document.cookie = "user=dalto";
+document.cookie = "edad=18";
+document.cookie = "escuela=enmsi";
+
+const crearCoookies = (name,expires,path,max-age)=>{
+    document.cookie = `${name};expires=${expires};path=${path};age=${age}`;
+}
+
+crearCoookies("user=dalto", "Mon 26 Apr 2023 12:00:00 UTC", "/", 600000); //expires(cuando va expirar), path(en que carpeta de la pagina se va almacenar la cookie), age(cuanto durara en segundo, por ejemplo: 60000)
+
+//---------------------------
+
+const newFechaUTC = dias =>{
+    let fecha = new Date();
+    fecha.setTime(fecha.getTime()+dias*1000*60*60*24);
+    return fecha;
+}
+
+const crearCoookie = (name,dias)=>{
+    expires = newFechaUTC(dias);
+    document.cookie = `${name};expires=${expires}`;
+}
+
+crearCoookie("user=daltocrack", 4);
+crearCoookie("nouser=nodaltocrack", 4);
+crearCoookie("mi=bebitofiufiu", 4);
+crearCoookie("novia=elvia", 4);
+
+//En caso de que no le agreguemos expires a una cookie, esta expirara cuando se finalize la sesion 
+//Las cookies tienen un limite de 4kb
+//Mientras que el session storage y el local storage tienen un limite de 5mb
+//Para editar un cookie solo hay que reescribirla y listo. Tambien si se sobreescriben sus atributos, se modifican 
+
+const obtenerCookie = cookieName =>{
+    let cookies = document.cookie;
+    cookies = cookies.split(";");
+    for(i = 0; cookies.length > i; i++){
+        let cookie = cookies[i].trim();
+        if(cookie.startsWith(cookieName)) return cookie.split("=")[1];
+    }
+    return "No se encontraron cookies con ese nombre"
+}
+
+//Para eliminar una cookie solo basta con crearla de nuevo poniendo su nombre y valor y agregandole el atributo max-age con un valor igual a 0 (Para que a los 0 milisegundos se borre)
+crearCoookie("novia=elvia;max-age=0");
+
+//Ejemplo de uso(Aviso de uso de cookies, cumplimiento con el RGPD y lave privacy)
+
+//-------------Crear aviso de cookies------------------------------
+
+
+const newFechaUTC = dias =>{
+    let fecha = new Date();
+    fecha.setTime(fecha.getTime()+dias*1000*60*60*24);
+    return fecha;
+}
+
+const crearCookie = (name,dias)=>{
+    expires = newFechaUTC(dias);
+    document.cookie = `${name};expires=${expires}`;
+}
+
+const obtenerCookie = cookieName =>{
+    let cookies = document.cookie;
+    cookies = cookies.split(";");
+    for(i = 0; cookies.length > i; i++){
+        let cookie = cookies[i].trim();
+        if(cookie.startsWith(cookieName)) return cookie.split("=")[1];
+    }
+    return "No se encontraron cookies con ese nombre"
+}
+
+
+
+if(obtenerCookie("acceptedCookies") !== "si"){
+    setTimeout(()=>{
+        document.querySelector(".bg-modal").style.zIndex = "10";
+        document.querySelector(".bg-modal").style.opacity = "1";
+        
+        document.getElementById("accept").addEventListener("click",()=>{
+            crearCookie("acceptedCookies=si", 30);
+            document.querySelector(".bg-modal").style.zIndex = "-1";
+            document.querySelector(".bg-modal").style.opacity = "0";
+        })
+        document.getElementById("deny").addEventListener("click",()=>{
+            crearCookie("acceptedCookies=no", 30);
+            document.querySelector(".bg-modal").style.zIndex = "-1";
+            document.querySelector(".bg-modal").style.opacity = "0";
+        })
+    }, 200)
+}
+
+//El script de aceptar cookies, debe ir en el head y no en el body, debido a que las cookies no tiene nada que ver con la pagina o el body por asi decirlo
+//Te preguntaras, ¿porque esto solo funciona con el time out?. Esto se debe a que, para que el script de las cookies pueda obtener los elementos del dom, el dom ya debe estar cargado, y debido a que pusimos el script de las cookies hasta arriba del codigo html, ese script debe esperar a que cargue lo de abajo para poder hacer uso de eso de abajo. Asi que si se pusiera el script de las cookies hasta abajo como lo hacemos comunmente, no seria necesario el setTimeOut();
