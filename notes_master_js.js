@@ -1092,3 +1092,41 @@ if(obtenerCookie("acceptedCookies") !== "si"){
 
 //El script de aceptar cookies, debe ir en el head y no en el body, debido a que las cookies no tiene nada que ver con la pagina o el body por asi decirlo
 //Te preguntaras, ¿porque esto solo funciona con el time out?. Esto se debe a que, para que el script de las cookies pueda obtener los elementos del dom, el dom ya debe estar cargado, y debido a que pusimos el script de las cookies hasta arriba del codigo html, ese script debe esperar a que cargue lo de abajo para poder hacer uso de eso de abajo. Asi que si se pusiera el script de las cookies hasta abajo como lo hacemos comunmente, no seria necesario el setTimeOut();
+
+
+
+
+"CANVAS"
+
+//Por defecto canvas trae un width de 300px y un height de 150px, si tratamos de modificar esto en CSS, la escala cambiara y para eso tendriamos que usar un metodo de escala que nos volveria locos. 
+//Para cambiar su tamaño, hay que cambiar el width y el height desde html
+//Tenemos que crear un contexto en canvas para poder dibujar graficos (2d y 3d)
+//Todos los metodos se aplican al contexto, no al canvas
+
+const canvas = document.getElementById(`canvas`);
+const ctx = canvas.getContext("2d");
+
+//Hay dos tipos de cuadrilateros: stroke y fill
+//El color o estilo de lo que se haga en canvas, debe definirse antes de crear un trazado para que se le pueda aplicar (para que el trazado pueda usar un estilo que ya se definio)
+ctx.lineWidth = "6"; //Grosor de cada linea
+ctx.strokeStyle = "#48e";
+ctx.fillStyle = "#26a";
+//Dibujar cuadrilatero stroke (bordes):
+ctx.strokeRect(30, 50, 400, 200); //(pixeles que se movera en el eje x, pixeles que se mover en el eje y, width, height)
+//Dibujar cuadrilatero fill (rellenado):
+ctx.fillRect(10,20,400,200);
+ctx.lineTo(100, 300); //Con esto creamos un punto (donde posiblemente termine o empiece una linea)
+ctx.lineTo(120, 350); //Con esto creamos otro punto (donde posiblemente termine o empiece una linea)
+ctx.lineTo(100, 400);
+ctx.lineTo(120, 450);
+ctx.stroke(); //Esto traza las lineas utilizando los puntos creados anteriormente
+ctx.closePath(); //Termina el trazado de todos esos puntos juntos
+ctx.beginPath(); //Con esto indicamos que vamos iniciar un nuevo trazo
+ctx.lineTo(80,300);
+ctx.lineTo(80,200);
+ctx.stroke();
+ctx.closePath();
+ctx.beginPath(); 
+ctx.arc(x, y, radio, startAngle, endAngle); //(coordenada x del centro del circulo, coordenada Y del centro del circulo, angulo en el que se inicia el arco, angulo en el que termina el arco)
+
+//Analiza el web paint hecho en la clase
